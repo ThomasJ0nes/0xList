@@ -1,7 +1,8 @@
 import React from "react";
+import { NextPage } from "next";
 
-const page = () => {
+const Listings: NextPage = () => {
   return <div>Listings</div>;
 };
 
-export default page;
+export default Listings;
