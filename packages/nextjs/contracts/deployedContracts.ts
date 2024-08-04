@@ -7,19 +7,8 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Listings: {
-      address: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
+      address: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
       abi: [
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "itemId",
-              type: "uint256",
-            },
-          ],
-          name: "Listings__AlreadyExistedItemId",
-          type: "error",
-        },
         {
           inputs: [
             {
@@ -108,11 +97,6 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
-              name: "id",
-              type: "uint256",
-            },
-            {
               internalType: "string",
               name: "name",
               type: "string",
@@ -137,25 +121,6 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "existedIds",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
           inputs: [],
           name: "getListings",
           outputs: [
@@ -175,6 +140,11 @@ const deployedContracts = {
                   internalType: "address",
                   name: "seller",
                   type: "address",
+                },
+                {
+                  internalType: "bool",
+                  name: "exists",
+                  type: "bool",
                 },
               ],
               internalType: "struct Listings.Item[]",
@@ -228,6 +198,11 @@ const deployedContracts = {
               internalType: "address",
               name: "seller",
               type: "address",
+            },
+            {
+              internalType: "bool",
+              name: "exists",
+              type: "bool",
             },
           ],
           stateMutability: "view",
