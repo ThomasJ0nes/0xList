@@ -11,7 +11,7 @@ const PropertyForm: React.FC = () => {
       <div className="flex flex-col lg:flex-row lg:space-x-4 mb-8 mt-12">
         {/* Property Picture */}
         <div className="flex-1 lg:flex-[0.25] relative h-64 bg-gray-200">
-          <Image src="https://via.placeholder.com/150" alt="Property" className="w-full h-full object-cover" />
+          <Image width={300} height={300} src="/frame-1.png" alt="Property" className="w-full h-full object-cover" />
         </div>
 
         {/* Property Details */}
@@ -40,7 +40,7 @@ const PropertyForm: React.FC = () => {
       <div className="flex flex-col lg:flex-row lg:space-x-4 mb-8 mt-12">
         {/* Property Picture */}
         <div className="flex-1 lg:flex-[0.25] relative h-64 bg-gray-200">
-          <Image src="https://via.placeholder.com/150" alt="Property" className="w-full h-full object-cover" />
+          <Image width={300} height={300} src="/frame-1.png" alt="Property" className="w-full h-full object-cover" />
         </div>
 
         {/* Property Details */}
