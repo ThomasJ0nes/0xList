@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
 contract Listings {
@@ -8,7 +8,8 @@ contract Listings {
 		address seller;
 	}
 
-	mapping(uint256 => bool) public existedIds;
+	uint256 private currentId;
+	mapping(uint256 => bool) public existingIds;
 	Item[] public items;
 	mapping(uint256 => uint256) public idToIndex;
 
@@ -16,19 +17,11 @@ contract Listings {
 	event UpdateItem(address indexed seller, uint256 itemId, string newName);
 	event DeleteItem(address indexed seller, uint256 itemId);
 
-	error Listings__AlreadyExistedItemId(uint256 itemId);
 	error Listings__NotExistedItemId(uint256 itemId);
 	error Listings__InvalidSellerAddress(address seller);
 
-	modifier checkNotExistedItemId(uint256 id) {
-		if (existedIds[id]) {
-			revert Listings__AlreadyExistedItemId(id);
-		}
-		_;
-	}
-
 	modifier checkExistedItemId(uint256 id) {
-		if (!existedIds[id]) {
+		if (!existingIds[id]) {
 			revert Listings__NotExistedItemId(id);
 		}
 		_;
@@ -42,14 +35,12 @@ contract Listings {
 		_;
 	}
 
-	function addItem(
-		uint256 id,
-		string calldata name
-	) public checkNotExistedItemId(id) {
-		existedIds[id] = true;
+	function addItem(string calldata name) public {
+		existingIds[currentId] = true;
 
-		Item memory item = Item(id, name, msg.sender);
+		Item memory item = Item(currentId, name, msg.sender);
 		items.push(item);
+		currentId++;
 
 		idToIndex[item.id] = items.length - 1;
 
@@ -75,7 +66,7 @@ contract Listings {
 		}
 		items.pop();
 
-		delete existedIds[id];
+		delete existingIds[id];
 		delete idToIndex[id];
 
 		emit DeleteItem(msg.sender, id);

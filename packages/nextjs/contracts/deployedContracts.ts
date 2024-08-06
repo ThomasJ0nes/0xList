@@ -12,17 +12,6 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
-              name: "itemId",
-              type: "uint256",
-            },
-          ],
-          name: "Listings__AlreadyExistedItemId",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
               internalType: "address",
               name: "seller",
               type: "address",
@@ -108,11 +97,6 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
-              name: "id",
-              type: "uint256",
-            },
-            {
               internalType: "string",
               name: "name",
               type: "string",
@@ -144,7 +128,7 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "existedIds",
+          name: "existingIds",
           outputs: [
             {
               internalType: "bool",
