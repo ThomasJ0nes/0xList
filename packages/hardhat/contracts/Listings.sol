@@ -6,12 +6,12 @@ contract Listings {
 		uint256 id;
 		string name;
 		address seller;
-		bool exists;
 	}
 
+	uint256 private currentId;
+	mapping(uint256 => bool) public existingIds;
 	Item[] public items;
 	mapping(uint256 => uint256) public idToIndex;
-	uint256 private currentId = 0;
 
 	event AddItem(address indexed seller, uint256 itemId);
 	event UpdateItem(address indexed seller, uint256 itemId, string newName);
@@ -21,7 +21,7 @@ contract Listings {
 	error Listings__InvalidSellerAddress(address seller);
 
 	modifier checkExistedItemId(uint256 id) {
-		if (id == 0 || !items[idToIndex[id]].exists) {
+		if (!existingIds[id]) {
 			revert Listings__NotExistedItemId(id);
 		}
 		_;
@@ -36,9 +36,11 @@ contract Listings {
 	}
 
 	function addItem(string calldata name) public {
-		currentId++; // Increment the ID
-		Item memory item = Item(currentId, name, msg.sender, true);
+		existingIds[currentId] = true;
+
+		Item memory item = Item(currentId, name, msg.sender);
 		items.push(item);
+		currentId++;
 
 		idToIndex[item.id] = items.length - 1;
 
@@ -63,6 +65,9 @@ contract Listings {
 			idToIndex[items[i].id] = i;
 		}
 		items.pop();
+
+		delete existingIds[id];
+		delete idToIndex[id];
 
 		emit DeleteItem(msg.sender, id);
 	}
