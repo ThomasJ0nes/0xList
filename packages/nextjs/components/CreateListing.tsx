@@ -24,7 +24,7 @@ const CreateListing: React.FC = () => {
     try {
       // Call the smart contract's addItem function without needing to pass an ID
       await writeContractAsync({
-        functionName: "addItem",
+        functionName: "addListing",
         args: [formData.title], // Only pass the title as argument
       });
 

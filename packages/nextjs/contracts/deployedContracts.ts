@@ -6,29 +6,122 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
   31337: {
+    ListingAttester: {
+      address: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "contract IEAS",
+              name: "eas",
+              type: "address",
+            },
+            {
+              internalType: "bytes32",
+              name: "listingSchemaUID",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [],
+          name: "InvalidEAS",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "_eas",
+          outputs: [
+            {
+              internalType: "contract IEAS",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "_listingSchemaUID",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "listingId",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "listingName",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "seller",
+              type: "address",
+            },
+          ],
+          name: "attestListing",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "attestationUID",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {},
+    },
     Listings: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      address: "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
       abi: [
         {
           inputs: [
             {
               internalType: "address",
+              name: "listingAttester",
+              type: "address",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
               name: "seller",
               type: "address",
             },
           ],
-          name: "Listings__InvalidSellerAddress",
+          name: "Listings__InvalidSeller",
           type: "error",
         },
         {
           inputs: [
             {
               internalType: "uint256",
-              name: "itemId",
+              name: "listingId",
               type: "uint256",
             },
           ],
-          name: "Listings__NotExistedItemId",
+          name: "Listings__NotExistedListingId",
           type: "error",
         },
         {
@@ -43,11 +136,11 @@ const deployedContracts = {
             {
               indexed: false,
               internalType: "uint256",
-              name: "itemId",
+              name: "listingId",
               type: "uint256",
             },
           ],
-          name: "AddItem",
+          name: "AddListing",
           type: "event",
         },
         {
@@ -62,11 +155,11 @@ const deployedContracts = {
             {
               indexed: false,
               internalType: "uint256",
-              name: "itemId",
+              name: "listingId",
               type: "uint256",
             },
           ],
-          name: "DeleteItem",
+          name: "DeleteListing",
           type: "event",
         },
         {
@@ -81,7 +174,7 @@ const deployedContracts = {
             {
               indexed: false,
               internalType: "uint256",
-              name: "itemId",
+              name: "listingId",
               type: "uint256",
             },
             {
@@ -91,8 +184,21 @@ const deployedContracts = {
               type: "string",
             },
           ],
-          name: "UpdateItem",
+          name: "UpdateListing",
           type: "event",
+        },
+        {
+          inputs: [],
+          name: "_listingAttester",
+          outputs: [
+            {
+              internalType: "contract ListingAttester",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
         },
         {
           inputs: [
@@ -102,7 +208,7 @@ const deployedContracts = {
               type: "string",
             },
           ],
-          name: "addItem",
+          name: "addListing",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -115,7 +221,7 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "deleteItem",
+          name: "deleteListing",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -141,7 +247,7 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "getListings",
+          name: "getAllListings",
           outputs: [
             {
               components: [
@@ -160,9 +266,14 @@ const deployedContracts = {
                   name: "seller",
                   type: "address",
                 },
+                {
+                  internalType: "bytes32",
+                  name: "attestationUID",
+                  type: "bytes32",
+                },
               ],
-              internalType: "struct Listings.Item[]",
-              name: "listings",
+              internalType: "struct Listings.Listing[]",
+              name: "allListings",
               type: "tuple[]",
             },
           ],
@@ -196,7 +307,7 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "items",
+          name: "listings",
           outputs: [
             {
               internalType: "uint256",
@@ -212,6 +323,11 @@ const deployedContracts = {
               internalType: "address",
               name: "seller",
               type: "address",
+            },
+            {
+              internalType: "bytes32",
+              name: "attestationUID",
+              type: "bytes32",
             },
           ],
           stateMutability: "view",
@@ -230,7 +346,7 @@ const deployedContracts = {
               type: "string",
             },
           ],
-          name: "updateItem",
+          name: "updateListing",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
