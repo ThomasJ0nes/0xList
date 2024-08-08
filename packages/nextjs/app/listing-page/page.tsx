@@ -1,12 +1,9 @@
 import React from "react";
 import Image from "next/image";
-import CreateListing from "~~/components/CreateListing";
 
 const PropertyForm: React.FC = () => {
   return (
     <div className="flex flex-col space-y-8 p-4 mt-12">
-      <CreateListing />
-
       {/* Second Section */}
       <div className="flex flex-col lg:flex-row lg:space-x-4 mb-8 mt-12">
         {/* Property Picture */}

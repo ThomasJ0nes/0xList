@@ -9,6 +9,10 @@ contract Listings {
 		string name;
 		address seller;
 		bytes32 attestationUID;
+		string location;
+		string description;
+		uint256 price;
+		uint256 beds;
 	}
 
 	uint256 private currentId;
@@ -18,7 +22,11 @@ contract Listings {
 	ListingAttester public _listingAttester;
 
 	event AddListing(address indexed seller, uint256 listingId);
-	event UpdateListing(address indexed seller, uint256 listingId, string newName);
+	event UpdateListing(
+		address indexed seller,
+		uint256 listingId,
+		string newName
+	);
 	event DeleteListing(address indexed seller, uint256 listingId);
 
 	error Listings__NotExistedListingId(uint256 listingId);
@@ -39,19 +47,33 @@ contract Listings {
 		_;
 	}
 
-	constructor(
-		address listingAttester
-	) {
-		_listingAttester = ListingAttester(
-			listingAttester
-		);
+	constructor(address listingAttester) {
+		_listingAttester = ListingAttester(listingAttester);
 	}
 
-	function addListing(string calldata name) public {
-		bytes32 attestationUID = _listingAttester
-			.attestListing(currentId, name, msg.sender);
-		
-		Listing memory listing = Listing(currentId, name, msg.sender, attestationUID);
+	function addListing(
+		string calldata name,
+		string calldata location,
+		string calldata description,
+		uint256 price,
+		uint256 beds
+	) public {
+		bytes32 attestationUID = _listingAttester.attestListing(
+			currentId,
+			name,
+			msg.sender
+		);
+
+		Listing memory listing = Listing(
+			currentId,
+			name,
+			msg.sender,
+			attestationUID,
+			location,
+			description,
+			price,
+			beds
+		);
 		listings.push(listing);
 		currentId++;
 
@@ -63,15 +85,37 @@ contract Listings {
 
 	function updateListing(
 		uint256 id,
-		string calldata name
+		string calldata name,
+		string calldata location,
+		string calldata description,
+		uint256 price,
+		uint256 beds
 	) public checkExistedListingId(id) isSeller(id) {
 		uint256 index = idToIndex[id];
-		listings[index].name = name;
+
+		// Only update fields that are not empty or zero
+		if (bytes(name).length > 0) {
+			listings[index].name = name;
+		}
+		if (bytes(location).length > 0) {
+			listings[index].location = location;
+		}
+		if (bytes(description).length > 0) {
+			listings[index].description = description;
+		}
+		if (price > 0) {
+			listings[index].price = price;
+		}
+		if (beds > 0) {
+			listings[index].beds = beds;
+		}
 
 		emit UpdateListing(msg.sender, id, name);
 	}
 
-	function deleteListing(uint256 id) public checkExistedListingId(id) isSeller(id) {
+	function deleteListing(
+		uint256 id
+	) public checkExistedListingId(id) isSeller(id) {
 		uint256 index = idToIndex[id];
 
 		for (uint256 i = index; i < listings.length - 1; i++) {
@@ -86,7 +130,11 @@ contract Listings {
 		emit DeleteListing(msg.sender, id);
 	}
 
-	function getAllListings() public view returns (Listing[] memory allListings) {
+	function getAllListings()
+		public
+		view
+		returns (Listing[] memory allListings)
+	{
 		return listings;
 	}
 }
