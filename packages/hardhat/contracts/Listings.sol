@@ -13,6 +13,7 @@ contract Listings {
 		string description;
 		uint256 price;
 		uint256 beds;
+		string cid;
 	}
 
 	uint256 private currentId;
@@ -56,7 +57,8 @@ contract Listings {
 		string calldata location,
 		string calldata description,
 		uint256 price,
-		uint256 beds
+		uint256 beds,
+		string calldata cid
 	) public {
 		bytes32 attestationUID = _listingAttester.attestListing(
 			currentId,
@@ -72,7 +74,8 @@ contract Listings {
 			location,
 			description,
 			price,
-			beds
+			beds,
+			cid
 		);
 		listings.push(listing);
 		currentId++;
