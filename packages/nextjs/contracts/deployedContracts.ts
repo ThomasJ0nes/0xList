@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     ListingAttester: {
-      address: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
       abi: [
         {
           inputs: [
@@ -89,7 +89,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     Listings: {
-      address: "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
+      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
       abi: [
         {
           inputs: [
@@ -207,6 +207,26 @@ const deployedContracts = {
               name: "name",
               type: "string",
             },
+            {
+              internalType: "string",
+              name: "location",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "description",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "price",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "beds",
+              type: "uint256",
+            },
           ],
           name: "addListing",
           outputs: [],
@@ -271,6 +291,26 @@ const deployedContracts = {
                   name: "attestationUID",
                   type: "bytes32",
                 },
+                {
+                  internalType: "string",
+                  name: "location",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "description",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "price",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "beds",
+                  type: "uint256",
+                },
               ],
               internalType: "struct Listings.Listing[]",
               name: "allListings",
@@ -329,6 +369,26 @@ const deployedContracts = {
               name: "attestationUID",
               type: "bytes32",
             },
+            {
+              internalType: "string",
+              name: "location",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "description",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "price",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "beds",
+              type: "uint256",
+            },
           ],
           stateMutability: "view",
           type: "function",
@@ -344,6 +404,26 @@ const deployedContracts = {
               internalType: "string",
               name: "name",
               type: "string",
+            },
+            {
+              internalType: "string",
+              name: "location",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "description",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "price",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "beds",
+              type: "uint256",
             },
           ],
           name: "updateListing",
