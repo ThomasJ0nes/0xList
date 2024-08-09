@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     ListingAttester: {
-      address: "0xc5a5C42992dECbae36851359345FE25997F5C42d",
+      address: "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690",
       abi: [
         {
           inputs: [
@@ -89,7 +89,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     ListingConnectionAttester: {
-      address: "0x67d269191c92Caf3cD7723F116c85e6E9bf55933",
+      address: "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB",
       abi: [
         {
           inputs: [
@@ -171,7 +171,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     Listings: {
-      address: "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E",
+      address: "0x9E545E3C0baAB3E08CdfD552C960A1050f373042",
       abi: [
         {
           inputs: [
@@ -262,7 +262,7 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "ConnectListing",
+          name: "CreateListingConnection",
           type: "event",
         },
         {

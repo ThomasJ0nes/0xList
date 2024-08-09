@@ -33,7 +33,7 @@ contract Listings {
 		string newName
 	);
 	event DeleteListing(address indexed seller, uint256 listingId);
-	event ConnectListing(address indexed buyer, uint256 listingId);
+	event CreateListingConnection(address indexed buyer, uint256 listingId);
 
 	error Listings__NotExistedListingId(uint256 listingId);
 	error Listings__InvalidSeller(address seller);
@@ -155,6 +155,7 @@ contract Listings {
 			listings[idToIndex[listingId]].seller,
 			msg.sender
 		);
+		emit CreateListingConnection(msg.sender, listingId);
 	}
 
 	function getAllListings()
