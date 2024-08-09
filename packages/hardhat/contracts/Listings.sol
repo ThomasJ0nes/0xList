@@ -17,7 +17,15 @@ contract Listings {
 		string cid;
 	}
 
+	struct ListingConnection {
+		uint256 listingId;
+		address seller;
+		address buyer;
+		bytes32 attestationUID;
+	}
+
 	uint256 private currentId;
+
 	mapping(uint256 => bool) public existingIds;
 	Listing[] public listings;
 	mapping(uint256 => uint256) public idToIndex;
@@ -25,6 +33,7 @@ contract Listings {
 
 	mapping(uint256 => mapping(address => bool)) public connectedBuyers;
 	ListingConnectionAttester public immutable _listingConnectionAttester;
+	ListingConnection[] public listingConnections;
 
 	event AddListing(address indexed seller, uint256 listingId);
 	event UpdateListing(
@@ -37,6 +46,7 @@ contract Listings {
 
 	error Listings__NotExistedListingId(uint256 listingId);
 	error Listings__InvalidSeller(address seller);
+	error Listings__SellerCannotSelfConnected(address buyer, uint256 listingId);
 	error Listings__BuyerAlreadyConnected(address buyer, uint256 listingId);
 
 	modifier checkExistedListingId(uint256 id) {
@@ -142,27 +152,47 @@ contract Listings {
 		emit DeleteListing(msg.sender, id);
 	}
 
-	function createListingConnection(
-		uint256 listingId
-	) public checkExistedListingId(listingId) returns (bytes32 attestationUID) {
-		if (connectedBuyers[listingId][msg.sender]) {
-			revert Listings__BuyerAlreadyConnected(msg.sender, listingId);
-		}
-
-		connectedBuyers[listingId][msg.sender] = true;
-		attestationUID = _listingConnectionAttester.attestListingConnection(
-			currentId,
-			listings[idToIndex[listingId]].seller,
-			msg.sender
-		);
-		emit CreateListingConnection(msg.sender, listingId);
-	}
-
 	function getAllListings()
 		public
 		view
 		returns (Listing[] memory allListings)
 	{
 		return listings;
+	}
+
+	function createListingConnection(
+		uint256 listingId
+	) public checkExistedListingId(listingId) returns (bytes32 attestationUID) {
+		if (msg.sender == listings[idToIndex[listingId]].seller) {
+			revert Listings__SellerCannotSelfConnected(msg.sender, listingId);
+		}
+
+		if (connectedBuyers[listingId][msg.sender]) {
+			revert Listings__BuyerAlreadyConnected(msg.sender, listingId);
+		}
+
+		connectedBuyers[listingId][msg.sender] = true;
+		attestationUID = _listingConnectionAttester.attestListingConnection(
+			listingId,
+			listings[idToIndex[listingId]].seller,
+			msg.sender
+		);
+		ListingConnection memory listingConnection = ListingConnection(
+			currentId,
+			listings[idToIndex[listingId]].seller,
+			msg.sender,
+			attestationUID
+		);
+		listingConnections.push(listingConnection);
+
+		emit CreateListingConnection(msg.sender, listingId);
+	}
+
+	function getAllListingConnections()
+		public
+		view
+		returns (ListingConnection[] memory allListingConnections)
+	{
+		return listingConnections;
 	}
 }

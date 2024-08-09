@@ -9,7 +9,7 @@ const deployListingAttester: DeployFunction = async function (hre: HardhatRuntim
     from: deployer,
     args: [
       "0x4200000000000000000000000000000000000021",
-      "0xa844aad897e631c5200bc2a0f5c093eeb3e96baa4f8428d93dbcb76e775906a9", // Sample SchemaUID
+      "0x78322a5635d33090ff3aaa05e12910c29ce2f861d61774b8eeeac99fe312952f",
     ],
     log: true,
     autoMine: true,
