@@ -1,4 +1,5 @@
 import React from "react";
+import MyAccount from "./MyAccount";
 import MyListings from "./MyListings";
 import RecentBookings from "./RecentBookings";
 import { Gauge } from "lucide-react";
@@ -21,7 +22,7 @@ const TabNav = () => {
             />
 
             <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
-              Tab content 1
+              <MyAccount />
             </div>
 
             <input
