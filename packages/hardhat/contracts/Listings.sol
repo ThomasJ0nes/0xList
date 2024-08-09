@@ -2,6 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "./ListingAttester.sol";
+import "./ListingConnectionAttester.sol";
 
 contract Listings {
 	struct Listing {
@@ -20,7 +21,10 @@ contract Listings {
 	mapping(uint256 => bool) public existingIds;
 	Listing[] public listings;
 	mapping(uint256 => uint256) public idToIndex;
-	ListingAttester public _listingAttester;
+	ListingAttester public immutable _listingAttester;
+
+	mapping(uint256 => mapping(address => bool)) public connectedBuyers;
+	ListingConnectionAttester public immutable _listingConnectionAttester;
 
 	event AddListing(address indexed seller, uint256 listingId);
 	event UpdateListing(
@@ -29,9 +33,11 @@ contract Listings {
 		string newName
 	);
 	event DeleteListing(address indexed seller, uint256 listingId);
+	event CreateListingConnection(address indexed buyer, uint256 listingId);
 
 	error Listings__NotExistedListingId(uint256 listingId);
 	error Listings__InvalidSeller(address seller);
+	error Listings__BuyerAlreadyConnected(address buyer, uint256 listingId);
 
 	modifier checkExistedListingId(uint256 id) {
 		if (!existingIds[id]) {
@@ -48,8 +54,11 @@ contract Listings {
 		_;
 	}
 
-	constructor(address listingAttester) {
+	constructor(address listingAttester, address listingConnectionAttester) {
 		_listingAttester = ListingAttester(listingAttester);
+		_listingConnectionAttester = ListingConnectionAttester(
+			listingConnectionAttester
+		);
 	}
 
 	function addListing(
@@ -78,10 +87,10 @@ contract Listings {
 			cid
 		);
 		listings.push(listing);
-		currentId++;
 
 		existingIds[currentId] = true;
-		idToIndex[listing.id] = listings.length - 1;
+		idToIndex[listing.id] = currentId;
+		currentId++;
 
 		emit AddListing(msg.sender, listing.id);
 	}
@@ -131,6 +140,22 @@ contract Listings {
 		delete idToIndex[id];
 
 		emit DeleteListing(msg.sender, id);
+	}
+
+	function createListingConnection(
+		uint256 listingId
+	) public checkExistedListingId(listingId) returns (bytes32 attestationUID) {
+		if (connectedBuyers[listingId][msg.sender]) {
+			revert Listings__BuyerAlreadyConnected(msg.sender, listingId);
+		}
+
+		connectedBuyers[listingId][msg.sender] = true;
+		attestationUID = _listingConnectionAttester.attestListingConnection(
+			currentId,
+			listings[idToIndex[listingId]].seller,
+			msg.sender
+		);
+		emit CreateListingConnection(msg.sender, listingId);
 	}
 
 	function getAllListings()

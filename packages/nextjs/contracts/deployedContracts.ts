@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     ListingAttester: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      address: "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690",
       abi: [
         {
           inputs: [
@@ -88,8 +88,90 @@ const deployedContracts = {
       ],
       inheritedFunctions: {},
     },
+    ListingConnectionAttester: {
+      address: "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB",
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "contract IEAS",
+              name: "eas",
+              type: "address",
+            },
+            {
+              internalType: "bytes32",
+              name: "listingConnectionSchemaUID",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [],
+          name: "InvalidEAS",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "_eas",
+          outputs: [
+            {
+              internalType: "contract IEAS",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "_listingConnectionSchemaUID",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "listingConnectionId",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "seller",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "buyer",
+              type: "address",
+            },
+          ],
+          name: "attestListingConnection",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "attestationUID",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {},
+    },
     Listings: {
-      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+      address: "0x9E545E3C0baAB3E08CdfD552C960A1050f373042",
       abi: [
         {
           inputs: [
@@ -98,9 +180,30 @@ const deployedContracts = {
               name: "listingAttester",
               type: "address",
             },
+            {
+              internalType: "address",
+              name: "listingConnectionAttester",
+              type: "address",
+            },
           ],
           stateMutability: "nonpayable",
           type: "constructor",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "buyer",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "listingId",
+              type: "uint256",
+            },
+          ],
+          name: "Listings__BuyerAlreadyConnected",
+          type: "error",
         },
         {
           inputs: [
@@ -141,6 +244,25 @@ const deployedContracts = {
             },
           ],
           name: "AddListing",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "buyer",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "listingId",
+              type: "uint256",
+            },
+          ],
+          name: "CreateListingConnection",
           type: "event",
         },
         {
@@ -201,6 +323,19 @@ const deployedContracts = {
           type: "function",
         },
         {
+          inputs: [],
+          name: "_listingConnectionAttester",
+          outputs: [
+            {
+              internalType: "contract ListingConnectionAttester",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
           inputs: [
             {
               internalType: "string",
@@ -235,6 +370,49 @@ const deployedContracts = {
           ],
           name: "addListing",
           outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "connectedBuyers",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "listingId",
+              type: "uint256",
+            },
+          ],
+          name: "createListingConnection",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "attestationUID",
+              type: "bytes32",
+            },
+          ],
           stateMutability: "nonpayable",
           type: "function",
         },

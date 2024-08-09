@@ -9,9 +9,12 @@ const deployListings: DeployFunction = async function (hre: HardhatRuntimeEnviro
   const listingAttester = await hre.ethers.getContract<Contract>("ListingAttester", deployer);
   const listingAttesterAddress = await listingAttester.getAddress();
 
+  const listingConnectionAttester = await hre.ethers.getContract<Contract>("ListingConnectionAttester", deployer);
+  const listingConnectionAttesterAddress = await listingConnectionAttester.getAddress();
+
   await deploy("Listings", {
     from: deployer,
-    args: [listingAttesterAddress],
+    args: [listingAttesterAddress, listingConnectionAttesterAddress],
     log: true,
     autoMine: true,
   });
