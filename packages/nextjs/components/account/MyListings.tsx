@@ -14,6 +14,7 @@ const MyListings = () => {
     beds: "",
     description: "",
   });
+  const [deleteConfirm, setDeleteConfirm] = useState("");
 
   // Fetch the listings for the user's address
   const {
@@ -42,6 +43,26 @@ const MyListings = () => {
     (document.getElementById("edit_listing_modal") as HTMLDialogElement)?.showModal();
   };
 
+  const handleDeleteClick = async (listingId: number) => {
+    if (deleteConfirm !== "confirm") {
+      alert('Please type "confirm" to proceed with deletion.');
+      return;
+    }
+
+    try {
+      await writeContractAsync({
+        functionName: "deleteListing",
+        args: [BigInt(listingId)], // Convert listingId to bigint here
+      });
+
+      (document.getElementById("delete_listing_modal") as HTMLDialogElement)?.close();
+      setDeleteConfirm("");
+    } catch (error) {
+      console.error("Error deleting listing:", error);
+      alert("Failed to delete listing. See console for details.");
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -50,13 +71,17 @@ const MyListings = () => {
     }));
   };
 
+  const handleDeleteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDeleteConfirm(e.target.value);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await writeContractAsync({
         functionName: "updateListing",
         args: [
-          selectedListing.id,
+          BigInt(selectedListing.id), // Ensure selectedListing.id is converted to bigint
           formData.title,
           formData.location,
           formData.description,
@@ -79,6 +104,17 @@ const MyListings = () => {
 
   if (error) {
     return <div className="flex justify-center items-center h-full">Error loading listings: {error.message}</div>;
+  }
+
+  if (!userSpecificListings || userSpecificListings.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        You have no listings right now.
+        <a className="ml-2 font-semibold underline hover:text-blue-500" href="/createlisting">
+          Create a Listing{" "}
+        </a>
+      </div>
+    );
   }
 
   return (
@@ -198,6 +234,42 @@ const MyListings = () => {
                       </button>
                     </div>
                   </form>
+                </div>
+              </dialog>
+              {/* Delete Listing Modal */}
+              <button
+                className="btn btn-error"
+                onClick={() => {
+                  setSelectedListing(listing);
+                  (document.getElementById("delete_listing_modal") as HTMLDialogElement)?.showModal();
+                }}
+              >
+                Delete Listing
+              </button>
+              <dialog id="delete_listing_modal" className="modal">
+                <div className="modal-box">
+                  <h3 className="font-bold text-lg">Delete Listing</h3>
+                  <p>Are you sure you want to delete your listing? The process will cost a small gas fee.</p>
+                  <label className="form-control w-full max-w-xs">
+                    <div className="label">
+                      <span className="label-text font-semibold">Type &quot;confirm&quot; to delete your post</span>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Type here"
+                      className="input input-bordered w-full max-w-xs"
+                      value={deleteConfirm}
+                      onChange={handleDeleteChange}
+                    />
+                  </label>
+                  <button className="btn btn-error mt-4" onClick={() => handleDeleteClick(selectedListing?.id)}>
+                    Delete Listing
+                  </button>
+                  <div className="modal-action">
+                    <form method="dialog">
+                      <button className="btn">Close</button>
+                    </form>
+                  </div>
                 </div>
               </dialog>
             </div>
