@@ -78,12 +78,12 @@ contract Listings {
 			cid
 		);
 		listings.push(listing);
-		currentId++;
 
-		existingIds[currentId] = true;
+		existingIds[currentId] = true; // Set the currentId as existing before incrementing it
 		idToIndex[listing.id] = listings.length - 1;
-
 		emit AddListing(msg.sender, listing.id);
+
+		currentId++;
 	}
 
 	function updateListing(
