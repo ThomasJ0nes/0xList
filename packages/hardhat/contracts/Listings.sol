@@ -2,6 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "./ListingAttester.sol";
+import "./ListingConnectionAttester.sol";
 
 contract Listings {
 	struct Listing {
@@ -16,11 +17,23 @@ contract Listings {
 		string cid;
 	}
 
+	struct ListingConnection {
+		uint256 listingId;
+		address seller;
+		address buyer;
+		bytes32 attestationUID;
+	}
+
 	uint256 private currentId;
+
 	mapping(uint256 => bool) public existingIds;
 	Listing[] public listings;
 	mapping(uint256 => uint256) public idToIndex;
-	ListingAttester public _listingAttester;
+	ListingAttester public immutable _listingAttester;
+
+	mapping(uint256 => mapping(address => bool)) public connectedBuyers;
+	ListingConnectionAttester public immutable _listingConnectionAttester;
+	ListingConnection[] public listingConnections;
 
 	event AddListing(address indexed seller, uint256 listingId);
 	event UpdateListing(
@@ -29,9 +42,12 @@ contract Listings {
 		string newName
 	);
 	event DeleteListing(address indexed seller, uint256 listingId);
+	event CreateListingConnection(address indexed buyer, uint256 listingId);
 
 	error Listings__NotExistedListingId(uint256 listingId);
 	error Listings__InvalidSeller(address seller);
+	error Listings__SellerCannotSelfConnected(address buyer, uint256 listingId);
+	error Listings__BuyerAlreadyConnected(address buyer, uint256 listingId);
 
 	modifier checkExistedListingId(uint256 id) {
 		if (!existingIds[id]) {
@@ -48,8 +64,11 @@ contract Listings {
 		_;
 	}
 
-	constructor(address listingAttester) {
+	constructor(address listingAttester, address listingConnectionAttester) {
 		_listingAttester = ListingAttester(listingAttester);
+		_listingConnectionAttester = ListingConnectionAttester(
+			listingConnectionAttester
+		);
 	}
 
 	function addListing(
@@ -79,11 +98,11 @@ contract Listings {
 		);
 		listings.push(listing);
 
-		existingIds[currentId] = true; // Set the currentId as existing before incrementing it
-		idToIndex[listing.id] = listings.length - 1;
-		emit AddListing(msg.sender, listing.id);
-
+		existingIds[currentId] = true;
+		idToIndex[listing.id] = currentId;
 		currentId++;
+
+		emit AddListing(msg.sender, listing.id);
 	}
 
 	function updateListing(
@@ -139,5 +158,41 @@ contract Listings {
 		returns (Listing[] memory allListings)
 	{
 		return listings;
+	}
+
+	function createListingConnection(
+		uint256 listingId
+	) public checkExistedListingId(listingId) returns (bytes32 attestationUID) {
+		if (msg.sender == listings[idToIndex[listingId]].seller) {
+			revert Listings__SellerCannotSelfConnected(msg.sender, listingId);
+		}
+
+		if (connectedBuyers[listingId][msg.sender]) {
+			revert Listings__BuyerAlreadyConnected(msg.sender, listingId);
+		}
+
+		connectedBuyers[listingId][msg.sender] = true;
+		attestationUID = _listingConnectionAttester.attestListingConnection(
+			listingId,
+			listings[idToIndex[listingId]].seller,
+			msg.sender
+		);
+		ListingConnection memory listingConnection = ListingConnection(
+			currentId,
+			listings[idToIndex[listingId]].seller,
+			msg.sender,
+			attestationUID
+		);
+		listingConnections.push(listingConnection);
+
+		emit CreateListingConnection(msg.sender, listingId);
+	}
+
+	function getAllListingConnections()
+		public
+		view
+		returns (ListingConnection[] memory allListingConnections)
+	{
+		return listingConnections;
 	}
 }
