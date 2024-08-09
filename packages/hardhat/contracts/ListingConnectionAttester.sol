@@ -20,25 +20,25 @@ contract ListingConnectionAttester {
 	}
 
 	function attestListingConnection(
-		uint256 listingConnectionId,
+		uint256 listingId,
 		address seller,
 		address buyer
 	) external returns (bytes32 attestationUID) {
-		// return
-		// 	_eas.attest(
-		// 		AttestationRequest({
-		// 			schema: _listingConnectionSchemaUID,
-		// 			data: AttestationRequestData({
-		// 				recipient: seller,
-		// 				expirationTime: NO_EXPIRATION_TIME, // No expiration time
-		// 				revocable: true,
-		// 				refUID: EMPTY_UID, // No references UI
-		// 				data: abi.encode(listingConnectionId, seller, buyer),
-		// 				value: 0 // No value/ETH
-		// 			})
-		// 		})
-		// 	);
 		return
-			0x0d455486a3dadeacfba5f340fe5bf84d1f6678b2e2af53536acc8a4274626f82; // Return sample value for local testing
+			_eas.attest(
+				AttestationRequest({
+					schema: _listingConnectionSchemaUID,
+					data: AttestationRequestData({
+						recipient: buyer,
+						expirationTime: NO_EXPIRATION_TIME, // No expiration time
+						revocable: true,
+						refUID: EMPTY_UID, // No references UI
+						data: abi.encode(listingId, seller, buyer),
+						value: 0 // No value/ETH
+					})
+				})
+			);
+		// return
+		// 	0x0d455486a3dadeacfba5f340fe5bf84d1f6678b2e2af53536acc8a4274626f82;
 	}
 }
