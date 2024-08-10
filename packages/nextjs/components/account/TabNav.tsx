@@ -2,6 +2,7 @@ import React from "react";
 import MyAccount from "./MyAccount";
 import MyListings from "./MyListings";
 import RecentBookings from "./RecentBookings";
+import Transactions from "./Transactions";
 import { Gauge } from "lucide-react";
 
 const TabNav = () => {
@@ -56,7 +57,7 @@ const TabNav = () => {
               aria-label="My Transactions"
             />
             <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
-              Tab content 4
+              <Transactions />
             </div>
           </div>
         </div>
