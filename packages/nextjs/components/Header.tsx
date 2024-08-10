@@ -1,17 +1,10 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import React, { useCallback, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
-import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
-import {
-  BaseFaucetsButton,
-  FaucetButton,
-  RainbowKitCustomConnectButton,
-  SuperchainFaucetButton,
-} from "~~/components/scaffold-eth";
+import { Bars3Icon, PlusCircleIcon, QueueListIcon, UserIcon } from "@heroicons/react/24/outline";
+import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 
 type HeaderMenuLink = {
@@ -26,9 +19,19 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/",
   },
   {
-    label: "Debug Contracts",
-    href: "/debug",
-    icon: <BugAntIcon className="h-4 w-4" />,
+    label: "All Listings",
+    href: "/listings",
+    icon: <QueueListIcon className="h-4 w-4" />,
+  },
+  {
+    label: "Create Listing",
+    href: "/createlisting",
+    icon: <PlusCircleIcon className="h-4 w-4" />,
+  },
+  {
+    label: "Account",
+    href: "/account",
+    icon: <UserIcon className="h-4 w-4" />,
   },
 ];
 
@@ -95,13 +98,10 @@ export const Header = () => {
           )}
         </div>
         <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
-          <div className="flex relative w-10 h-10">
-            <BaseLogo />
+          <div className="flex relative  h-10">
+            <img src="/Logo0xList.png" />
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold leading-tight">Scaffold-Base</span>
-            <span className="text-xs">Ethereum dev stack</span>
-          </div>
+          <div className="flex flex-col"></div>
         </Link>
         <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
           <HeaderMenuLinks />
@@ -109,24 +109,21 @@ export const Header = () => {
       </div>
       <div className="navbar-end flex-grow mr-4">
         <RainbowKitCustomConnectButton />
-        <FaucetButton />
-        <SuperchainFaucetButton />
-        <BaseFaucetsButton />
       </div>
     </div>
   );
 };
 
-const BaseLogo = () => {
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-  const { resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme === "dark";
-  return isMounted ? (
-    <Image alt="Base logo" className="cursor-pointer" fill src={`/Base_Symbol_${isDarkMode ? "White" : "Black"}.svg`} />
-  ) : (
-    <div className="w-full h-full rounded-full"></div>
-  );
-};
+//const BaseLogo = () => {
+//const [isMounted, setIsMounted] = useState(false);
+//useEffect(() => {
+//setIsMounted(true);
+// }, []);
+// const { resolvedTheme } = useTheme();
+//const isDarkMode = resolvedTheme === "dark";
+// return isMounted ? (
+//   <Image alt="Base logo" className="cursor-pointer" fill src={`/Base_Symbol_${isDarkMode ? "White" : "Black"}.svg`} />
+// ) : (
+//<div className="w-full h-full rounded-full"></div>
+// );
+//};
