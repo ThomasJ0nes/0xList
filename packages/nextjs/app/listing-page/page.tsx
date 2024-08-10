@@ -36,7 +36,7 @@ const page = () => {
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <RainbowKitCustomConnectButton />
-              <a href="#" className="text-sm font-semibold leading-6 ">
+              <a href="/createlisting" className="text-sm font-semibold leading-6 hover:underline">
                 List On Chain <span aria-hidden="true">→</span>
               </a>
             </div>
