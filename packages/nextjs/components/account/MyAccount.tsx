@@ -1,10 +1,19 @@
 "use client";
 
 import { useAccount } from "wagmi";
-import { Address } from "~~/components/scaffold-eth";
+import { Address, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 
 const MyAccount = () => {
   const { address: connectedAddress } = useAccount();
+
+  if (!connectedAddress) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-xl font-semibold mr-5">Please connect your wallet to access the account page!</p>
+        <RainbowKitCustomConnectButton />
+      </div>
+    );
+  }
 
   return (
     <>
