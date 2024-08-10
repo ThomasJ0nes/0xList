@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     ListingAttester: {
-      address: "0xCD8a1C3ba11CF5ECfa6267617243239504a98d90",
+      address: "0x82e01223d51Eb87e16A03E24687EDF0F294da6f1",
       abi: [
         {
           inputs: [
@@ -89,7 +89,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     ListingConnectionAttester: {
-      address: "0x82e01223d51Eb87e16A03E24687EDF0F294da6f1",
+      address: "0x2bdCC0de6bE1f7D2ee689a0342D76F52E8EFABa3",
       abi: [
         {
           inputs: [
@@ -147,12 +147,7 @@ const deployedContracts = {
             },
             {
               internalType: "address",
-              name: "seller",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "buyer",
+              name: "connectedUser",
               type: "address",
             },
           ],
@@ -170,8 +165,85 @@ const deployedContracts = {
       ],
       inheritedFunctions: {},
     },
+    ListingPaymentAttester: {
+      address: "0x7969c5eD335650692Bc04293B07F5BF2e7A673C0",
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "contract IEAS",
+              name: "eas",
+              type: "address",
+            },
+            {
+              internalType: "bytes32",
+              name: "listingPaymentSchemaUID",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [],
+          name: "InvalidEAS",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "_eas",
+          outputs: [
+            {
+              internalType: "contract IEAS",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "_listingPaymentSchemaUID",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "listingId",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "buyer",
+              type: "address",
+            },
+          ],
+          name: "attestListingPayment",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "attestationUID",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {},
+    },
     Listings: {
-      address: "0x2bdCC0de6bE1f7D2ee689a0342D76F52E8EFABa3",
+      address: "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650",
       abi: [
         {
           inputs: [
@@ -185,24 +257,40 @@ const deployedContracts = {
               name: "listingConnectionAttester",
               type: "address",
             },
+            {
+              internalType: "address",
+              name: "listingPaymentAttester",
+              type: "address",
+            },
           ],
           stateMutability: "nonpayable",
           type: "constructor",
         },
         {
+          inputs: [],
+          name: "FailedTodSendEther",
+          type: "error",
+        },
+        {
           inputs: [
-            {
-              internalType: "address",
-              name: "buyer",
-              type: "address",
-            },
             {
               internalType: "uint256",
               name: "listingId",
               type: "uint256",
             },
           ],
-          name: "Listings__BuyerAlreadyConnected",
+          name: "Listings_ListingUnavailableForBuying",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "connectedUser",
+              type: "address",
+            },
+          ],
+          name: "Listings__InvalidConnectedUser",
           type: "error",
         },
         {
@@ -231,7 +319,7 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "address",
-              name: "buyer",
+              name: "connectedUser",
               type: "address",
             },
             {
@@ -241,6 +329,38 @@ const deployedContracts = {
             },
           ],
           name: "Listings__SellerCannotSelfConnected",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "amountOfETH",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "price",
+              type: "uint256",
+            },
+          ],
+          name: "Listings__UnequalAmountOfETHAndPrice",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "connectedUser",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "listingId",
+              type: "uint256",
+            },
+          ],
+          name: "Listings__UserAlreadyConnected",
           type: "error",
         },
         {
@@ -269,6 +389,25 @@ const deployedContracts = {
               indexed: true,
               internalType: "address",
               name: "buyer",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "listingId",
+              type: "uint256",
+            },
+          ],
+          name: "BuyListing",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "connectedUser",
               type: "address",
             },
             {
@@ -352,6 +491,19 @@ const deployedContracts = {
           type: "function",
         },
         {
+          inputs: [],
+          name: "_listingPaymentAttester",
+          outputs: [
+            {
+              internalType: "contract ListingPaymentAttester",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
           inputs: [
             {
               internalType: "string",
@@ -393,6 +545,38 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "uint256",
+              name: "id",
+              type: "uint256",
+            },
+          ],
+          name: "buyListing",
+          outputs: [],
+          stateMutability: "payable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "buyers",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
               name: "",
               type: "uint256",
             },
@@ -402,7 +586,7 @@ const deployedContracts = {
               type: "address",
             },
           ],
-          name: "connectedBuyers",
+          name: "connectedUsers",
           outputs: [
             {
               internalType: "bool",
@@ -477,8 +661,33 @@ const deployedContracts = {
                 },
                 {
                   internalType: "address",
-                  name: "seller",
+                  name: "connectedUser",
                   type: "address",
+                },
+                {
+                  internalType: "bytes32",
+                  name: "attestationUID",
+                  type: "bytes32",
+                },
+              ],
+              internalType: "struct Listings.ListingConnection[]",
+              name: "allListingConnections",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getAllListingPayments",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "listingId",
+                  type: "uint256",
                 },
                 {
                   internalType: "address",
@@ -491,8 +700,8 @@ const deployedContracts = {
                   type: "bytes32",
                 },
               ],
-              internalType: "struct Listings.ListingConnection[]",
-              name: "allListingConnections",
+              internalType: "struct Listings.ListingPayment[]",
+              name: "allListingPayments",
               type: "tuple[]",
             },
           ],
@@ -595,8 +804,32 @@ const deployedContracts = {
             },
             {
               internalType: "address",
-              name: "seller",
+              name: "connectedUser",
               type: "address",
+            },
+            {
+              internalType: "bytes32",
+              name: "attestationUID",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "listingPayments",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "listingId",
+              type: "uint256",
             },
             {
               internalType: "address",

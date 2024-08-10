@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-import "./ListingAttester.sol";
-import "./ListingConnectionAttester.sol";
+import { ListingAttester } from "./ListingAttester.sol";
+import { ListingConnectionAttester } from "./ListingConnectionAttester.sol";
+import { ListingPaymentAttester } from "./ListingPaymentAttester.sol";
 
 contract Listings {
 	struct Listing {
@@ -19,21 +20,29 @@ contract Listings {
 
 	struct ListingConnection {
 		uint256 listingId;
-		address seller;
+		address connectedUser;
+		bytes32 attestationUID;
+	}
+
+	struct ListingPayment {
+		uint256 listingId;
 		address buyer;
 		bytes32 attestationUID;
 	}
 
 	uint256 private currentId;
-
 	mapping(uint256 => bool) public existingIds;
 	Listing[] public listings;
 	mapping(uint256 => uint256) public idToIndex;
 	ListingAttester public immutable _listingAttester;
 
-	mapping(uint256 => mapping(address => bool)) public connectedBuyers;
+	mapping(uint256 => mapping(address => bool)) public connectedUsers;
 	ListingConnectionAttester public immutable _listingConnectionAttester;
 	ListingConnection[] public listingConnections;
+
+	mapping(uint256 => address) public buyers;
+	ListingPaymentAttester public immutable _listingPaymentAttester;
+	ListingPayment[] public listingPayments;
 
 	event AddListing(address indexed seller, uint256 listingId);
 	event UpdateListing(
@@ -42,12 +51,29 @@ contract Listings {
 		string newName
 	);
 	event DeleteListing(address indexed seller, uint256 listingId);
-	event CreateListingConnection(address indexed buyer, uint256 listingId);
+	event BuyListing(address indexed buyer, uint256 listingId);
+	event CreateListingConnection(
+		address indexed connectedUser,
+		uint256 listingId
+	);
 
 	error Listings__NotExistedListingId(uint256 listingId);
 	error Listings__InvalidSeller(address seller);
-	error Listings__SellerCannotSelfConnected(address buyer, uint256 listingId);
-	error Listings__BuyerAlreadyConnected(address buyer, uint256 listingId);
+	error Listings__SellerCannotSelfConnected(
+		address connectedUser,
+		uint256 listingId
+	);
+	error Listings_ListingUnavailableForBuying(uint256 listingId);
+	error Listings__UserAlreadyConnected(
+		address connectedUser,
+		uint256 listingId
+	);
+	error Listings__InvalidConnectedUser(address connectedUser);
+	error Listings__UnequalAmountOfETHAndPrice(
+		uint256 amountOfETH,
+		uint256 price
+	);
+	error FailedTodSendEther();
 
 	modifier checkExistedListingId(uint256 id) {
 		if (!existingIds[id]) {
@@ -56,18 +82,39 @@ contract Listings {
 		_;
 	}
 
-	modifier isSeller(uint256 id) {
-		uint256 index = idToIndex[id];
+	modifier isSeller(uint256 listingId) {
+		uint256 index = idToIndex[listingId];
 		if (msg.sender != listings[index].seller) {
 			revert Listings__InvalidSeller(msg.sender);
 		}
 		_;
 	}
 
-	constructor(address listingAttester, address listingConnectionAttester) {
+	modifier isListingAvailableForBuying(uint256 listingId) {
+		if (buyers[listingId] != address(0)) {
+			revert Listings_ListingUnavailableForBuying(listingId);
+		}
+		_;
+	}
+
+	modifier isValidConnectedUser(uint256 listingId) {
+		if (!connectedUsers[listingId][msg.sender]) {
+			revert Listings__InvalidConnectedUser(msg.sender);
+		}
+		_;
+	}
+
+	constructor(
+		address listingAttester,
+		address listingConnectionAttester,
+		address listingPaymentAttester
+	) {
 		_listingAttester = ListingAttester(listingAttester);
 		_listingConnectionAttester = ListingConnectionAttester(
 			listingConnectionAttester
+		);
+		_listingPaymentAttester = ListingPaymentAttester(
+			listingPaymentAttester
 		);
 	}
 
@@ -99,7 +146,7 @@ contract Listings {
 		listings.push(listing);
 
 		existingIds[currentId] = true;
-		idToIndex[listing.id] = currentId;
+		idToIndex[listing.id] = listings.length - 1;
 		currentId++;
 
 		emit AddListing(msg.sender, listing.id);
@@ -152,6 +199,45 @@ contract Listings {
 		emit DeleteListing(msg.sender, id);
 	}
 
+	function buyListing(
+		uint256 id
+	)
+		public
+		payable
+		checkExistedListingId(id)
+		isListingAvailableForBuying(id)
+		isValidConnectedUser(id)
+	{
+		uint256 index = idToIndex[id];
+
+		if (msg.value != listings[index].price) {
+			revert Listings__UnequalAmountOfETHAndPrice(
+				msg.value,
+				listings[index].price
+			);
+		}
+
+		buyers[id] = msg.sender;
+
+		bytes32 attestationUID = _listingPaymentAttester.attestListingPayment(
+			id,
+			msg.sender
+		);
+		ListingPayment memory listingPayment = ListingPayment(
+			id,
+			msg.sender,
+			attestationUID
+		);
+		listingPayments.push(listingPayment);
+
+		(bool success, ) = listings[index].seller.call{ value: msg.value }("");
+		if (!success) {
+			revert FailedTodSendEther();
+		}
+
+		emit BuyListing(msg.sender, id);
+	}
+
 	function getAllListings()
 		public
 		view
@@ -162,30 +248,43 @@ contract Listings {
 
 	function createListingConnection(
 		uint256 listingId
-	) public checkExistedListingId(listingId) returns (bytes32 attestationUID) {
-		if (msg.sender == listings[idToIndex[listingId]].seller) {
+	)
+		public
+		checkExistedListingId(listingId)
+		isListingAvailableForBuying(listingId)
+		returns (bytes32 attestationUID)
+	{
+		uint256 index = idToIndex[listingId];
+
+		if (msg.sender == listings[index].seller) {
 			revert Listings__SellerCannotSelfConnected(msg.sender, listingId);
 		}
 
-		if (connectedBuyers[listingId][msg.sender]) {
-			revert Listings__BuyerAlreadyConnected(msg.sender, listingId);
+		if (connectedUsers[listingId][msg.sender]) {
+			revert Listings__UserAlreadyConnected(msg.sender, listingId);
 		}
 
-		connectedBuyers[listingId][msg.sender] = true;
+		connectedUsers[listingId][msg.sender] = true;
 		attestationUID = _listingConnectionAttester.attestListingConnection(
 			listingId,
-			listings[idToIndex[listingId]].seller,
 			msg.sender
 		);
 		ListingConnection memory listingConnection = ListingConnection(
-			currentId,
-			listings[idToIndex[listingId]].seller,
+			listingId,
 			msg.sender,
 			attestationUID
 		);
 		listingConnections.push(listingConnection);
 
 		emit CreateListingConnection(msg.sender, listingId);
+	}
+
+	function getAllListingPayments()
+		public
+		view
+		returns (ListingPayment[] memory allListingPayments)
+	{
+		return listingPayments;
 	}
 
 	function getAllListingConnections()
