@@ -30,12 +30,21 @@ const RecentBookings = () => {
         .filter((payment: any) => payment.buyer.toLowerCase() === address.toLowerCase())
         .map((payment: any) => {
           const listing = listings.find((listing: any) => listing.id === payment.listingId);
-          return {
-            ...payment,
-            name: listing?.name,
-            cid: listing?.cid,
-            price: listing?.price,
-          };
+          if (listing) {
+            return {
+              ...payment,
+              name: listing.name,
+              cid: listing.cid,
+              price: listing.price,
+            };
+          } else {
+            return {
+              ...payment,
+              name: "Listing deleted",
+              cid: null,
+              price: "N/A",
+            };
+          }
         });
       setUserPayments(filteredPayments);
     }
@@ -59,11 +68,17 @@ const RecentBookings = () => {
         {userPayments.map((payment: any, index: number) => (
           <div key={index} className="col-span-1">
             <div className="border p-4 rounded-lg shadow-md">
-              <img
-                className="h-full w-full object-cover"
-                src={`https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${payment.cid}`}
-                alt={`Booking for ${payment.name}`}
-              />
+              {payment.cid ? (
+                <img
+                  className="h-full w-full object-cover"
+                  src={`https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${payment.cid}`}
+                  alt={`Booking for ${payment.name}`}
+                />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center bg-gray-200 text-gray-500">
+                  No image available
+                </div>
+              )}
               <div className="mt-2">
                 <h3 className="text-lg font-semibold">Listing: {payment.name}</h3>
                 <p>Price: {payment.price.toString()} WEI</p>
