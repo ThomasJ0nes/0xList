@@ -2,7 +2,6 @@ import React from "react";
 import MyAccount from "./MyAccount";
 import MyListings from "./MyListings";
 import RecentBookings from "./RecentBookings";
-import Transactions from "./Transactions";
 import { Gauge } from "lucide-react";
 
 const TabNav = () => {
@@ -43,21 +42,10 @@ const TabNav = () => {
               name="my_tabs_2"
               role="tab"
               className="tab text-lg font-semibold py-4 px-6" // Increased font size, padding for larger tabs
-              aria-label="Recent Bookings"
+              aria-label="Your Purchases"
             />
             <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
               <RecentBookings />
-            </div>
-
-            <input
-              type="radio"
-              name="my_tabs_2"
-              role="tab"
-              className="tab text-lg font-semibold py-4 px-6" // Increased font size, padding for larger tabs
-              aria-label="My Transactions"
-            />
-            <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
-              <Transactions />
             </div>
           </div>
         </div>
