@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
@@ -22,19 +22,43 @@ const SkeletonLoader = () => {
 };
 
 export const ListingsList = () => {
+  const { address } = useAccount();
+
   // Fetch all listings from the contract
   const {
     data: listings,
-    isLoading,
-    error,
+    isLoading: isLoadingListings,
+    error: listingsError,
   } = useScaffoldReadContract({
     contractName: "Listings",
     functionName: "getAllListings",
   });
 
-  const { address } = useAccount();
+  // Fetch all listing connections from the contract
+  const {
+    data: connections,
+    isLoading: isLoadingConnections,
+    error: connectionsError,
+  } = useScaffoldReadContract({
+    contractName: "Listings",
+    functionName: "getAllListingConnections",
+  });
 
   const { writeContractAsync, isMining } = useScaffoldWriteContract("Listings");
+
+  const [connectedListings, setConnectedListings] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    if (connections && address) {
+      const userConnectedListings = connections
+        .filter(
+          (connection: any) =>
+            connection.connectedUser && connection.connectedUser.toLowerCase() === address.toLowerCase(),
+        )
+        .map((connection: any) => connection.listingId);
+      setConnectedListings(new Set(userConnectedListings));
+    }
+  }, [connections, address]);
 
   const handleMintToContact = async (listingId: number) => {
     try {
@@ -43,14 +67,14 @@ export const ListingsList = () => {
         args: [BigInt(listingId)],
       });
       alert("Successfully created a connection!");
+      setConnectedListings(prev => new Set(prev).add(listingId));
     } catch (err) {
       console.error("Error creating listing connection:", err);
       alert("Failed to create a connection. See console for details.");
     }
   };
 
-  // Render loading state with skeletons
-  if (isLoading) {
+  if (isLoadingListings || isLoadingConnections) {
     return (
       <div className="flex justify-center mt-12 px-4">
         <div className="w-full max-w-7xl overflow-hidden rounded-m shadow">
@@ -66,9 +90,12 @@ export const ListingsList = () => {
     );
   }
 
-  // Render error state
-  if (error) {
-    return <div className="flex justify-center items-center h-full">Error loading listings: {error.message}</div>;
+  if (listingsError || connectionsError) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        Error loading data: {listingsError?.message || connectionsError?.message}
+      </div>
+    );
   }
 
   return (
@@ -77,7 +104,6 @@ export const ListingsList = () => {
         <ul role="list" className="divide-y divide-gray-200">
           {listings?.map((listing: any, index: number) => (
             <li key={index} className="px-6 py-6 flex items-center space-x-6">
-              {/* Property Picture */}
               <div className="w-1/3 h-100">
                 <img
                   className="w-full h-full rounded-md object-cover"
@@ -86,7 +112,6 @@ export const ListingsList = () => {
                 />
               </div>
 
-              {/* Property Details */}
               <div className="w-2/3 flex flex-col justify-between space-y-2">
                 <div>
                   <h2 className="text-xl font-bold">{listing.name}</h2>
@@ -98,17 +123,21 @@ export const ListingsList = () => {
                 <p className="text-base mt-2">
                   Price: {listing.price.toString()} | Beds: {listing.beds.toString()}
                 </p>
-                <div className="flex justify-end">
-                  <button
-                    className={`btn btn-primary px-4 py-2 text-base font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      isMining ? "loading" : ""
-                    }`}
-                    onClick={() => handleMintToContact(listing.id)}
-                    disabled={isMining || address === listing.seller}
-                  >
-                    {isMining ? "Minting..." : "Mint to contact the owner"}
-                  </button>
-                </div>
+                {connectedListings.has(listing.id) ? (
+                  <p className="text-red-500 font-semibold">You have already connected with this listing.</p>
+                ) : (
+                  <div className="flex justify-end">
+                    <button
+                      className={`btn btn-primary px-4 py-2 text-base font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        isMining ? "loading" : ""
+                      }`}
+                      onClick={() => handleMintToContact(listing.id)}
+                      disabled={isMining || address === listing.seller}
+                    >
+                      {isMining ? "Minting..." : "Mint to contact the owner"}
+                    </button>
+                  </div>
+                )}
               </div>
             </li>
           ))}
