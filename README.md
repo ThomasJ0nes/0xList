@@ -6,6 +6,10 @@
   <a href="https://0xlist.vercel.app/">Website</a>
 </h4>
 
+Smart Contract Location /packages/hardhat/contracts
+
+Front End Location /packages/nextjs
+
 0xList was developed using a well-structured stack of modern Web3 and web technologies, designed to create an efficient, onchain marketplace experience. The project was built on top of the ETH Scaffold Base Boilerplate, which provided a reliable starting point for quickly developing and deploying our dApp.
 
 
