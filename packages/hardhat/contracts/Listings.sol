@@ -162,7 +162,6 @@ contract Listings {
 	) public checkExistedListingId(id) isSeller(id) {
 		uint256 index = idToIndex[id];
 
-		// Only update fields that are not empty or zero
 		if (bytes(name).length > 0) {
 			listings[index].name = name;
 		}
@@ -197,6 +196,39 @@ contract Listings {
 		delete idToIndex[id];
 
 		emit DeleteListing(msg.sender, id);
+	}
+
+	function createListingConnection(
+		uint256 listingId
+	)
+		public
+		checkExistedListingId(listingId)
+		isListingAvailableForBuying(listingId)
+		returns (bytes32 attestationUID)
+	{
+		uint256 index = idToIndex[listingId];
+
+		if (msg.sender == listings[index].seller) {
+			revert Listings__SellerCannotSelfConnected(msg.sender, listingId);
+		}
+
+		if (connectedUsers[listingId][msg.sender]) {
+			revert Listings__UserAlreadyConnected(msg.sender, listingId);
+		}
+
+		connectedUsers[listingId][msg.sender] = true;
+		attestationUID = _listingConnectionAttester.attestListingConnection(
+			listingId,
+			msg.sender
+		);
+		ListingConnection memory listingConnection = ListingConnection(
+			listingId,
+			msg.sender,
+			attestationUID
+		);
+		listingConnections.push(listingConnection);
+
+		emit CreateListingConnection(msg.sender, listingId);
 	}
 
 	function buyListing(
@@ -246,37 +278,12 @@ contract Listings {
 		return listings;
 	}
 
-	function createListingConnection(
-		uint256 listingId
-	)
+	function getAllListingConnections()
 		public
-		checkExistedListingId(listingId)
-		isListingAvailableForBuying(listingId)
-		returns (bytes32 attestationUID)
+		view
+		returns (ListingConnection[] memory allListingConnections)
 	{
-		uint256 index = idToIndex[listingId];
-
-		if (msg.sender == listings[index].seller) {
-			revert Listings__SellerCannotSelfConnected(msg.sender, listingId);
-		}
-
-		if (connectedUsers[listingId][msg.sender]) {
-			revert Listings__UserAlreadyConnected(msg.sender, listingId);
-		}
-
-		connectedUsers[listingId][msg.sender] = true;
-		attestationUID = _listingConnectionAttester.attestListingConnection(
-			listingId,
-			msg.sender
-		);
-		ListingConnection memory listingConnection = ListingConnection(
-			listingId,
-			msg.sender,
-			attestationUID
-		);
-		listingConnections.push(listingConnection);
-
-		emit CreateListingConnection(msg.sender, listingId);
+		return listingConnections;
 	}
 
 	function getAllListingPayments()
@@ -285,13 +292,5 @@ contract Listings {
 		returns (ListingPayment[] memory allListingPayments)
 	{
 		return listingPayments;
-	}
-
-	function getAllListingConnections()
-		public
-		view
-		returns (ListingConnection[] memory allListingConnections)
-	{
-		return listingConnections;
 	}
 }

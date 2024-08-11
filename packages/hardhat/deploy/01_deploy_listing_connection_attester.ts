@@ -9,7 +9,7 @@ const deployListingConnectionAttester: DeployFunction = async function (hre: Har
     from: deployer,
     args: [
       "0x4200000000000000000000000000000000000021",
-      "0x70f935e1f3139195e5f2baf984dc658e725257d70db44f9571f3ab317d22a211",
+      "0xb48e73c340e24d8b1ecb667484f63e5211e8cf0a0d949bb7f312060db29ac5c2",
     ],
     log: true,
     autoMine: true,
