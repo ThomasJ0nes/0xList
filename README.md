@@ -1,52 +1,73 @@
 
-# 🏗️ Scaffold-Base 🔵
+#  🛍️ 0xList - The world’s largest onchain marketplace. List, buy and sell anything onchain superfast on layer2 🔵
 
 <h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
+  
+  <a href="https://0xlist.vercel.app/">Website</a>
 </h4>
 
-Scaffold-Base is a fork of Scaffold-ETH-2 ready to ship to Base. This fork provides native support for Base and Base Sepolia testnet, direct access to the Base faucets, and [coinbase-sdk-wallet](https://github.com/coinbase/coinbase-wallet-sdk/) beta preconfigured which allows 4337 account abstraction using passkeys.
+0xList was developed using a well-structured stack of modern Web3 and web technologies, designed to create an efficient, onchain marketplace experience. The project was built on top of the ETH Scaffold Base Boilerplate, which provided a reliable starting point for quickly developing and deploying our dApp.
 
-![Scaffold-Base)](https://github.com/damianmarti/se-2/assets/466652/eac667a7-68fb-4f69-a427-126f7de4114d)
 
-We highly recommend the Scaffold-ETH-2 docs as the primary guideline.
+![image](https://github.com/user-attachments/assets/fa689118-4ea9-4a6a-bfaf-29eb7a67a170)
 
-# (forked from 🏗 Scaffold-ETH-2)
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+Technologies Used:
 
-⚙️ Built using NextJS, RainbowKit, Hardhat, Wagmi, Viem, and Typescript.
+- Next.js: We selected Next.js for its strong server-side rendering (SSR) capabilities, which allowed us to create a dynamic and performant user interface. Its seamless integration with React and other tools made it an ideal choice for the frontend of 0xList.
 
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🪝 **[Custom hooks](https://docs.scaffoldeth.io/hooks/)**: Collection of React hooks wrapper around [wagmi](https://wagmi.sh/) to simplify interactions with smart contracts with typescript autocompletion.
-- 🧱 [**Components**](https://docs.scaffoldeth.io/components/): Collection of common web3 components to quickly build your frontend.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
+- Wagmi & RainbowKit: To manage wallet connections and blockchain interactions, we used Wagmi and RainbowKit. These libraries enabled users to connect their wallets easily, switch networks as needed, and interact with the platform's smart contracts.
 
-![Debug Contracts tab](https://github.com/damianmarti/se-2/assets/466652/672d178c-38c9-4c9a-953d-d36acf08f3cd)
+- TypeScript: We implemented TypeScript across the entire project to enforce type safety, improve code maintainability, and reduce errors during development.
 
-## Requirements
+- Custom React Hooks: We developed custom React Hooks as well as used the boilplate hooks to facilitate interaction between the frontend and smart contracts. These hooks encapsulate the logic required for contract calls, ensuring that the frontend remains clean and maintainable.
 
-Before you begin, you need to install the following tools:
+- IPFS & Pinata: For storing images and media associated with listings, we used IPFS, leveraging Pinata for efficient and decentralized file uploads. This ensures that listing data is stored immutably and remains accessible through the IPFS network.
 
-- [Node (>= v18.17)](https://nodejs.org/en/download/)
-- Yarn ([v1](https://classic.yarnpkg.com/en/docs/install/) or [v2+](https://yarnpkg.com/getting-started/install))
-- [Git](https://git-scm.com/downloads)
+- Tailwind CSS & DaisyUI: Tailwind CSS and DaisyUI were used to style the application, providing a modern and responsive design. This combination allowed us to maintain a consistent and accessible user interface across different devices.
 
-## Quickstart
+- Vercel: The frontend of 0xList was deployed using Vercel, as its fits well for deploying apps made in Nextjs quickly and easily. 
 
-To get started with Scaffold-Base, follow the steps below:
+- Hardhat: Hardhat was used for smart contract development and testing. It provided us with the tools needed to write, deploy, and rigorously test our contracts, ensuring they were secure and functioned as intended.
 
-1. Clone this repo & install dependencies
+- Partner Technologies:
+
+- Ethereum Attestation Service (EAS): EAS played a crucial role in our contract architecture. By using EAS, we could create attestations for various actions on the platform, adding a layer of verification and trust to transactions. This helped ensure that each listing, connection, and payment was securely attested onchain.
+
+- Base Network: We deployed the 0xList smart contracts on the Base network, which provided a secure and scalable environment for our onchain transactions. Base’s infrastructure allowed us to leverage low-cost transactions and ensured high performance, making it an ideal choice for building our onchain marketplace where speed and low gas fees are key.
+
+Solidity Smart Contracts: 
+
+- Listings Contract: The Listings contract is the core of the platform, allowing sellers to create, update, and delete listings. It manages the entire lifecycle of a listing, including user connections and purchases. Only connected users can purchase a listing, and once a listing is bought, it becomes unavailable to others.
+
+- ListingAttester Contract: This contract interacts with the EAS to create attestations for new listings. Each listing on the platform is backed by an attestation, ensuring that the listing data is verified and trustworthy.
+
+- ListingConnectionAttester Contract: This contract handles attestations related to user connections with listings. When a user connects to a listing, this attester creates a corresponding attestation, which is used to verify the user's connection status when they attempt to make a purchase.
+
+- ListingPaymentAttester Contract: The ListingPaymentAttester contract is responsible for creating attestations when a user completes a purchase. This ensures that each transaction is recorded and verified, adding an extra layer of security and transparency to the buying process.
+
+
+To replicate follow these intructions: 
+
+For interacting with Deployed Contracts in Base Sepolia 
+ 
+Simply run 
+```
+yarn install
+```
+
+```
+yarn start
+```
+
+For developing on local chain using hard hat run 
 
 ```
 git clone https://github.com/BuidlGuidl/scaffold-base
 cd scaffold-base
 yarn install
 ```
-
-2. Run a local network in the first terminal:
+ Run a local network in the first terminal:
 
 ```
 yarn chain
@@ -54,99 +75,14 @@ yarn chain
 
 This command starts a local Ethereum network using Hardhat. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `hardhat.config.ts`.
 
-3. On a second terminal, deploy the test contract:
+ On a second terminal, deploy the test contract:
 
 ```
 yarn deploy
 ```
 
-This command deploys a test smart contract to the local network. The contract is located in `packages/hardhat/contracts` and can be modified to suit your needs. The `yarn deploy` command uses the deploy script located in `packages/hardhat/deploy` to deploy the contract to the network. You can also customize the deploy script.
-
-4. On a third terminal, start your NextJS app:
+ On a third terminal, start your NextJS app:
 
 ```
 yarn start
 ```
-
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
-
-**What's next**:
-
-- Edit your smart contract `YourContract.sol` in `packages/hardhat/contracts`
-- Edit your frontend homepage at `packages/nextjs/app/page.tsx`. For guidance on [routing](https://nextjs.org/docs/app/building-your-application/routing/defining-routes) and configuring [pages/layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) checkout the Next.js documentation.
-- Edit your deployment scripts in `packages/hardhat/deploy`
-- Edit your smart contract test in: `packages/hardhat/test`. To run test use `yarn hardhat:test`
-
-
-Redeploy your contracts:
-
-```
-yarn deploy --reset
-```
-
-
-# 🔵 Deploy to Base
-
-
-When you are ready to deploy to Base, generate a deployer account: 
-
-```
-yarn generate
-```
-
-
-
-Fund the deployer account with ETH on Base at:
-
-```
-yarn account
-```
-
-
-Deploy to Base:
-
-```
-yarn deploy --network base 
-```
-
-
-Set your target network to Base:
-
-> Change "chains.hardhat" to "chains.base" in targetNetworks from `scaffold.config.ts` in `packages/nextjs`
-
-
-Deploy your app to Vercel:
-
-```
-yarn vercel:yolo --prod
-```
-
-# 🍽️ Fork Mainnet Base
-
-> stop your `yarn chain`
-
-```
-
-yarn fork
-
-```
-
-(now your local hardhat chain is a fork of Base and you can talk to forked Base contracts)
-
-# <img src="https://github.com/damianmarti/se-2/assets/466652/a795d1f3-980b-4e53-9784-ac53b6dd980e" width="35"> Coinbase Smart Wallet
-
-Coinbase Smart Wallet will be shown automatically when [scaffold.config.ts](https://github.com/BuidlGuidl/scaffold-base/blob/main/packages/nextjs/scaffold.config.ts) `targetNetworks` contains the network ***baseSepolia***.
-
-Since [coinbase beta sdk connector](https://github.com/coinbase/coinbase-wallet-sdk/blob/master/packages/wallet-sdk/docs/v4_with_wagmi.md) for now only works with Base Sepolia.
-
-For interacting with contracts, you can nicely use [scaffold-eth custom hooks](https://docs.scaffoldeth.io/hooks/) (wrappers around wagmi) or wagmi hooks directly without needing to change anything. 
-
-## Documentation
-
-Visit our [docs](https://docs.scaffoldeth.io) to learn how to start building with Scaffold-ETH 2.
-
-To know more about its features, check out our [website](https://scaffoldeth.io).
-
-## Contributing
-
-Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
