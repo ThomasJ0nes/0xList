@@ -74,6 +74,20 @@ export const ListingsList = () => {
     }
   };
 
+  const handleBuyListing = async (listingId: number, price: number) => {
+    try {
+      await writeContractAsync({
+        functionName: "buyListing",
+        args: [BigInt(listingId)],
+        value: BigInt(price), // Convert price to BigInt
+      });
+      alert("Purchase successful!");
+    } catch (err) {
+      console.error("Error purchasing listing:", err);
+      alert("Failed to purchase the listing. See console for details.");
+    }
+  };
+
   if (isLoadingListings || isLoadingConnections) {
     return (
       <div className="flex justify-center mt-12 px-4">
@@ -124,7 +138,20 @@ export const ListingsList = () => {
                   Price: {listing.price.toString()} | Beds: {listing.beds.toString()}
                 </p>
                 {connectedListings.has(listing.id) ? (
-                  <p className="text-red-500 font-semibold">You have already connected with this listing.</p>
+                  <div>
+                    <p className=" font-bold">
+                      You have connected with this listings you can now choose to purchase or contact the seller.
+                    </p>
+                    <button
+                      className={`btn btn-success px-4 py-2 mt-2 text-base font-semibold rounded-md shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                        isMining ? "loading" : ""
+                      }`}
+                      onClick={() => handleBuyListing(listing.id, listing.price)}
+                      disabled={isMining}
+                    >
+                      {isMining ? "Processing..." : "Buy Now"}
+                    </button>
+                  </div>
                 ) : (
                   <div className="flex justify-end">
                     <button
