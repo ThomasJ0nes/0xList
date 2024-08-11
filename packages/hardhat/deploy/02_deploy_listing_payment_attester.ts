@@ -9,7 +9,7 @@ const deployListingPaymentAttester: DeployFunction = async function (hre: Hardha
     from: deployer,
     args: [
       "0x4200000000000000000000000000000000000021",
-      "0x70f935e1f3139195e5f2baf984dc658e725257d70db44f9571f3ab317d22a211",
+      "0x03af61d3b039018ecefddd540027c175a252c6cb8dd13535441979c984d2b7ef",
     ],
     log: true,
     autoMine: true,
